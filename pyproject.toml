@@ -1,3 +1,52 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jsoninja"
+version = "0.1.1"
+description = "Jsoninja is a library that allows you to generate JSON's from templates written with Python dicts."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Víctor Lázaro", email = "vlazaro@outlook.es" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Other Environment",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Source = "https://github.com/vlazaroes/jsoninja"
+
+[project.optional-dependencies]
+dev = [
+    "black == 23.3.0",
+    "coverage == 7.2.2",
+    "isort == 5.12.0",
+    "mypy == 1.1.1",
+    "pre-commit == 3.2.2",
+    "pylint == 2.17.2",
+    "pytest == 7.2.2",
+]
+
 [tool.isort]
 profile = "black"
 
