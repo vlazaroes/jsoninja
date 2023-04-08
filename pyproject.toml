@@ -1,0 +1,9 @@
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+strict = true
+
+[tool.pylint]
+disable = "R0903"
+max-line-length = "88"
