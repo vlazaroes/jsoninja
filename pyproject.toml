@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jsoninja"
-version = "0.1.1"
+version = "0.1.0"
 description = "Jsoninja is a library that allows you to generate JSON's from templates written with Python dicts."
 readme = "README.md"
 requires-python = ">=3.8"
