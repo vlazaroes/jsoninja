@@ -1,6 +1,6 @@
 <div align="center">
 	<p>
-        <a href="https://pypi.org/project/jsoninja" target="_blank">
+        <a href="https://pypi.org/project/jsoninja">
             <img src="https://em-content.zobj.net/thumbs/240/apple/354/ninja_1f977.png" width="100px">
         </a>
     </p>
@@ -13,10 +13,10 @@
         </em>
     </p>
     <p>
-        <a href="https://pypi.org/project/jsoninja" target="_blank">
+        <a href="https://pypi.org/project/jsoninja">
             <img src="https://img.shields.io/pypi/v/jsoninja?label=Version" alt="Library version">
         </a>
-        <a href="https://pypi.org/project/jsoninja" target="_blank">
+        <a href="https://pypi.org/project/jsoninja">
             <img src="https://img.shields.io/pypi/pyversions/jsoninja.svg?label=Python" alt="Supported Python versions">
         </a>
     </p>
