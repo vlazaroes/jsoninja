@@ -6,18 +6,16 @@ on:
 jobs:
   release:
     name: Publish in PyPI
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Setup Python
+      - name: Setup
         uses: actions/setup-python@v4
         with:
-          python-version: "3.6"
-      - name: Install build dependencies
-        run: |
-          pip install build
-          pip install setuptools --upgrade
-      - name: Build distribution
+          python-version: "3.7"
+      - name: Install
+        run: pip install build
+      - name: Build
         run: python -m build
       - name: Publish
         uses: pypa/gh-action-pypi-publish@v1.8.5
