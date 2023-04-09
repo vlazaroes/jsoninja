@@ -71,6 +71,22 @@ class TestJsoninja:
         }
         assert jsoninja.replace(template, replacements) == expected
 
+    def test_float_replacement(self) -> None:
+        """
+        Tests that the replacement of float variables works correctly.
+        """
+        jsoninja = Jsoninja()
+        template = {
+            "float": "{{float}}",
+        }
+        replacements = {
+            "float": 1.5,
+        }
+        expected = {
+            "float": 1.5,
+        }
+        assert jsoninja.replace(template, replacements) == expected
+
     def test_bool_replacement(self) -> None:
         """
         Tests that the replacement of bool variables works correctly.
@@ -137,6 +153,7 @@ class TestJsoninja:
         template = {
             "str": "str",
             "int": 1,
+            "float": 1.5,
             "bool": True,
             "dict": {
                 "foo": "bar",
@@ -153,6 +170,7 @@ class TestJsoninja:
         expected = {
             "str": "str",
             "int": 1,
+            "float": 1.5,
             "bool": True,
             "dict": {
                 "foo": "bar",
@@ -184,7 +202,7 @@ class TestJsoninja:
             "married": False,
             "attributes": {
                 "height": 180,
-                "weight": 75,
+                "weight": 75.5,
             },
             "hobbies": [
                 "climbing",
@@ -198,7 +216,7 @@ class TestJsoninja:
             "married": False,
             "attributes": {
                 "height": 180,
-                "weight": 75,
+                "weight": 75.5,
             },
             "hobbies": [
                 "climbing",
