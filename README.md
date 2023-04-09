@@ -1,6 +1,8 @@
 <div align="center">
 	<p>
-        <img src="https://em-content.zobj.net/thumbs/240/apple/354/ninja_1f977.png" width="100px">
+        <a href="https://pypi.org/project/jsoninja" target="_blank">
+            <img src="https://em-content.zobj.net/thumbs/240/apple/354/ninja_1f977.png" width="100px">
+        </a>
     </p>
 	<h1>Jsoninja</h1>
     <p>
@@ -9,6 +11,14 @@
             <br/>
             templates written with Python dicts.
         </em>
+    </p>
+    <p>
+        <a href="https://pypi.org/project/jsoninja" target="_blank">
+            <img src="https://img.shields.io/pypi/v/jsoninja?label=Version" alt="Library version">
+        </a>
+        <a href="https://pypi.org/project/jsoninja" target="_blank">
+            <img src="https://img.shields.io/pypi/pyversions/jsoninja.svg?label=Python" alt="Supported Python versions">
+        </a>
     </p>
 </div>
 
@@ -70,6 +80,7 @@ from jsoninja import Jsoninja
 
 def generate_password() -> str:
     return "super_secret_password"
+
 
 jsoninja = Jsoninja()
 template = {
