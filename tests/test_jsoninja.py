@@ -145,6 +145,28 @@ class TestJsoninja:
         }
         assert jsoninja.replace(template, replacements) == expected
 
+    def test_tuple_replacement(self) -> None:
+        """
+        Tests that the replacement of tuple variables works correctly.
+        """
+        jsoninja = Jsoninja()
+        template = {
+            "tuple": "{{tuple}}",
+        }
+        replacements = {
+            "tuple": (
+                "foo",
+                "bar",
+            ),
+        }
+        expected = {
+            "tuple": (
+                "foo",
+                "bar",
+            ),
+        }
+        assert jsoninja.replace(template, replacements) == expected
+
     def test_static_values(self) -> None:
         """
         Tests that the static values are working correctly.
@@ -162,6 +184,10 @@ class TestJsoninja:
                 "foo",
                 "bar",
             ],
+            "tuple": (
+                "foo",
+                "bar",
+            ),
             "dynamic": "{{dynamic}}",
         }
         replacements = {
@@ -179,6 +205,10 @@ class TestJsoninja:
                 "foo",
                 "bar",
             ],
+            "tuple": (
+                "foo",
+                "bar",
+            ),
             "dynamic": "dynamic",
         }
         assert jsoninja.replace(template, replacements) == expected
@@ -195,6 +225,7 @@ class TestJsoninja:
             "married": "{{married}}",
             "attributes": "{{attributes}}",
             "hobbies": "{{hobbies}}",
+            "languages": "{{languages}}",
         }
         replacements = {
             "name": "John",
@@ -208,6 +239,10 @@ class TestJsoninja:
                 "climbing",
                 "videogames",
             ],
+            "languages": (
+                "english",
+                "spanish",
+            ),
         }
         expected = {
             "firstname": "John",
@@ -222,6 +257,10 @@ class TestJsoninja:
                 "climbing",
                 "videogames",
             ],
+            "languages": (
+                "english",
+                "spanish",
+            ),
         }
         assert jsoninja.replace(template, replacements) == expected
 
