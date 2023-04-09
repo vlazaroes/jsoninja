@@ -14,7 +14,9 @@ jobs:
         with:
           python-version: "3.6"
       - name: Install build dependencies
-        run: pip install build
+        run: |
+          pip install build
+          pip install setuptools --upgrade
       - name: Build distribution
         run: python -m build
       - name: Publish
