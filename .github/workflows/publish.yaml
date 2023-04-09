@@ -6,13 +6,13 @@ on:
 jobs:
   release:
     name: Publish in PyPI
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.6.8"
+          python-version: "3.6"
       - name: Build distribution
         run: python -m build
       - name: Publish
