@@ -81,6 +81,6 @@ replacements = {
 result = jsoninja.replace(template, replacements)
 
 # {
-#   "pasword": "super_secret_password",
+#   "password": "super_secret_password",
 # }
 ```
