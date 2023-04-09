@@ -4,7 +4,7 @@ Python dicts.
 """
 
 import re
-from typing import Any
+from typing import Any, Dict
 
 
 class Jsoninja:
@@ -13,8 +13,8 @@ class Jsoninja:
     """
 
     def replace(
-        self, template: dict[str, Any], replacements: dict[str, Any]
-    ) -> dict[str, Any]:
+        self, template: Dict[str, Any], replacements: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Replaces the variables declared in the template.
 
@@ -33,8 +33,8 @@ class Jsoninja:
         return self.__scan_template(template, replacements)
 
     def __scan_template(
-        self, template: dict[str, Any], replacements: dict[str, Any]
-    ) -> dict[str, Any]:
+        self, template: Dict[str, Any], replacements: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Iterate the template and replace the variables with the values.
 
@@ -57,7 +57,7 @@ class Jsoninja:
                         template[key] = replacement
         return template
 
-    def __get_replacement(self, value: Any, replacements: dict[str, Any]) -> Any:
+    def __get_replacement(self, value: Any, replacements: Dict[str, Any]) -> Any:
         """
         Gets the value associated with the template variable.
 
