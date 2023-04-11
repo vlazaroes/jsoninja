@@ -30,7 +30,7 @@ class Jsoninja:
         """
         if not template:
             raise ValueError("A template has not been loaded.")
-        return self.__scan_template(template, replacements)
+        return self.__scan_template(template.copy(), replacements)
 
     def __scan_template(
         self, template: Dict[str, Any], replacements: Dict[str, Any]
