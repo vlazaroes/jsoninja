@@ -4,7 +4,7 @@ Python dicts.
 """
 
 import re
-from typing import Any, Dict
+from typing import Any, Dict, List, Union
 
 
 class Jsoninja:
@@ -13,17 +13,19 @@ class Jsoninja:
     """
 
     def replace(
-        self, template: Dict[str, Any], replacements: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self,
+        template: Union[List[Dict[str, Any]], Dict[str, Any]],
+        replacements: Dict[str, Any],
+    ) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
         """
         Replaces the variables declared in the template.
 
         Args:
-            template (dict): A dict that declares the template structure and variables.
-            replacements (dict): A dict with the values to be used as replacements.
+            template (list | dict): Declares the template structure and variables.
+            replacements (dict): The values to be used as replacements.
 
         Returns:
-            A dict containing the template with the replaced values.
+            A list or a dict containing the template with the replaced values.
 
         Raises:
             ValueError: A template has not been loaded.
@@ -33,21 +35,42 @@ class Jsoninja:
         return self.__scan_template(template.copy(), replacements)
 
     def __scan_template(
+        self,
+        template: Union[List[Dict[str, Any]], Dict[str, Any]],
+        replacements: Dict[str, Any],
+    ) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
+        """
+        Checks if the template is a list or a dict.
+
+        Args:
+            template (list | dict): Declares the template structure and variables.
+            replacements (dict): The values to be used as replacements.
+
+        Returns:
+            A list or a dict containing the template with the replaced values.
+        """
+        if isinstance(template, list):
+            for idx, obj in enumerate(template):
+                template[idx] = self.__scan_nodes(obj, replacements)
+            return template
+        return self.__scan_nodes(template, replacements)
+
+    def __scan_nodes(
         self, template: Dict[str, Any], replacements: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
         Iterate the template and replace the variables with the values.
 
         Args:
-            template (dict): A dict that declares the template structure and variables.
-            replacements (dict): A dict with the values to be used as replacements.
+            template (dict): Declares the template structure and variables.
+            replacements (dict): The values to be used as replacements.
 
         Returns:
             A dict containing the template with the replaced values.
         """
         for key, value in template.items():
             if isinstance(value, dict):
-                template[key] = self.__scan_template(value, replacements)
+                template[key] = self.__scan_nodes(value, replacements)
             else:
                 replacement = self.__get_replacement(value, replacements)
                 if replacement is not None:
@@ -63,7 +86,7 @@ class Jsoninja:
 
         Args:
             value (Any): The value of the item.
-            replacements (dict): A dict with the values to be used as replacements.
+            replacements (dict): The values to be used as replacements.
 
         Returns:
             The value associated with the template variable.
