@@ -39,6 +39,25 @@ class TestJsoninja:
         ):
             jsoninja.replace(template, replacements)
 
+    def test_variable_declarations(self) -> None:
+        """
+        Tests that the variable declarations work correctly.
+        """
+        jsoninja = Jsoninja()
+        template = {
+            "declaration1": "{{declaration1}}",
+            "declaration2": "{{ declaration2 }}",
+        }
+        replacements = {
+            "declaration1": "foo",
+            "declaration2": "bar",
+        }
+        expected = {
+            "declaration1": "foo",
+            "declaration2": "bar",
+        }
+        assert jsoninja.replace(template, replacements) == expected
+
     def test_str_replacement(self) -> None:
         """
         Tests that the replacement of str variables works correctly.
