@@ -21,6 +21,19 @@ class TestJsoninja:
         with pytest.raises(ValueError, match="A template has not been loaded."):
             jsoninja.replace({}, {})
 
+    def test_returns_new_object(self) -> None:
+        """
+        Tests that the template is not replaced and returns a new object.
+        """
+        jsoninja = Jsoninja()
+        template = {
+            "foo": "{{foo}}",
+        }
+        replacements = {
+            "foo": "bar",
+        }
+        assert jsoninja.replace(template, replacements) != template
+
     def test_missing_replacement(self) -> None:
         """
         Tests that an exception is raised when the replacement value of a variable
@@ -38,6 +51,25 @@ class TestJsoninja:
             KeyError, match='Unable to find a replacement for "lastname".'
         ):
             jsoninja.replace(template, replacements)
+
+    def test_variable_declarations(self) -> None:
+        """
+        Tests that the variable declarations work correctly.
+        """
+        jsoninja = Jsoninja()
+        template = {
+            "declaration1": "{{declaration1}}",
+            "declaration2": "{{ declaration2 }}",
+        }
+        replacements = {
+            "declaration1": "foo",
+            "declaration2": "bar",
+        }
+        expected = {
+            "declaration1": "foo",
+            "declaration2": "bar",
+        }
+        assert jsoninja.replace(template, replacements) == expected
 
     def test_str_replacement(self) -> None:
         """

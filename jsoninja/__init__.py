@@ -71,7 +71,7 @@ class Jsoninja:
         Raises:
             KeyError: Unable to find a replacement for "...".
         """
-        variable_regex = re.compile(r"\{\{[a-zA-Z0-9_]+\}\}")
+        variable_regex = re.compile(r"\{\{\ ?[a-zA-Z0-9_]+\ ?\}\}")
         if variable_regex.fullmatch(str(value)):
             value_key = self.__clean_value(value)
             if value_key in replacements:
@@ -89,4 +89,4 @@ class Jsoninja:
         Returns:
             The value of the item without the brackets that declare the variable.
         """
-        return value[2:-2]
+        return value[2:-2].strip()
