@@ -12,6 +12,12 @@ class Jsoninja:
     Class that contains the necessary methods of Jsoninja.
     """
 
+    def __init__(self) -> None:
+        """
+        Initializes the instance with the variable RegEx.
+        """
+        self.__variable_regex = re.compile(r"\{\{\ ?[a-zA-Z0-9_]+\ ?\}\}")
+
     def replace(
         self,
         template: Union[List[Dict[str, Any]], Dict[str, Any]],
@@ -94,8 +100,7 @@ class Jsoninja:
         Raises:
             KeyError: Unable to find a replacement for "...".
         """
-        variable_regex = re.compile(r"\{\{\ ?[a-zA-Z0-9_]+\ ?\}\}")
-        if variable_regex.fullmatch(str(value)):
+        if self.__variable_regex.fullmatch(str(value)):
             value_key = self.__clean_value(value)
             if value_key in replacements:
                 return replacements[value_key]
