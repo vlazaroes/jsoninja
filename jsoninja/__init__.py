@@ -3,6 +3,7 @@ Jsoninja is a library that allows you to generate JSON's from templates written 
 Python dicts.
 """
 
+import copy
 import re
 from typing import Any, Dict, List, Union
 
@@ -38,7 +39,7 @@ class Jsoninja:
         """
         if not template:
             raise ValueError("A template has not been loaded.")
-        return self.__scan_template(template.copy(), replacements)
+        return self.__scan_template(copy.deepcopy(template), replacements)
 
     def __scan_template(
         self,
