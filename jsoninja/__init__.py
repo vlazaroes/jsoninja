@@ -47,7 +47,7 @@ class Jsoninja:
         replacements: Dict[str, Any],
     ) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
         """
-        Checks if the template is a list or a dict.
+        Checks if the first node of the template is a list or a dict.
 
         Args:
             template (list | dict): Declares the template structure and variables.
@@ -81,7 +81,7 @@ class Jsoninja:
         self, template: Dict[str, Any], replacements: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
-        Iterate the dict template.
+        Iterate the dict template and stores the key replacements to be replaced.
 
         Args:
             template (dict): Declares the template structure and variables.
@@ -90,8 +90,13 @@ class Jsoninja:
         Returns:
             A dict containing the template with the replaced values.
         """
+        key_replacements = {}
         for key, value in template.items():
+            replacement = self.__get_replacement(key, replacements)
+            if replacement is not None:
+                key_replacements[key] = replacement
             self.__scan_node(template, replacements, key, value)
+        self.__replace_keys(template, key_replacements)
         return template
 
     def __scan_node(
@@ -102,7 +107,7 @@ class Jsoninja:
         value: Any,
     ) -> None:
         """
-        Replace the node variables with the values.
+        Replace the node variables with the corresponding values.
 
         Args:
             template (list | dict): Declares the template structure and variables.
@@ -122,12 +127,12 @@ class Jsoninja:
                 else:
                     template[key] = replacement  # type: ignore[index]
 
-    def __get_replacement(self, value: Any, replacements: Dict[str, Any]) -> Any:
+    def __get_replacement(self, variable: Any, replacements: Dict[str, Any]) -> Any:
         """
         Gets the value associated with the template variable.
 
         Args:
-            value (Any): The value of the item.
+            variable (Any): The template variable.
             replacements (dict): The values to be used as replacements.
 
         Returns:
@@ -136,8 +141,8 @@ class Jsoninja:
         Raises:
             KeyError: Unable to find a replacement for "...".
         """
-        if self.__variable_regex.fullmatch(str(value)):
-            value_key = self.__clean_value(value)
+        if self.__variable_regex.fullmatch(str(variable)):
+            value_key = self.__clean_value(variable)
             if value_key in replacements:
                 return replacements[value_key]
             raise KeyError(f'Unable to find a replacement for "{value_key}".')
@@ -145,12 +150,25 @@ class Jsoninja:
 
     def __clean_value(self, value: str) -> str:
         """
-        Removes the brackets that declare the variable from the item value.
+        Removes the brackets that declare the variable from the value.
 
         Args:
-            value (str): The value of the item.
+            value (str): The value corresponding to the template variable.
 
         Returns:
-            The value of the item without the brackets that declare the variable.
+            The value without the brackets that declare the variable.
         """
         return value[2:-2].strip()
+
+    def __replace_keys(
+        self, template: Dict[str, Any], replacements: Dict[str, Any]
+    ) -> None:
+        """
+        Replaces the variables declared in the keys.
+
+        Args:
+            template (dict): Declares the template structure and variables.
+            replacements (dict): The values to be used as replacements.
+        """
+        for key, new_key in replacements.items():
+            template[new_key] = template.pop(key)
