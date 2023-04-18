@@ -57,16 +57,31 @@ class Jsoninja:
             A list or a dict containing the template with the replaced values.
         """
         if isinstance(template, list):
-            for idx, obj in enumerate(template):
-                template[idx] = self.__scan_nodes(obj, replacements)
-            return template
-        return self.__scan_nodes(template, replacements)
+            return self.__scan_list(template, replacements)
+        return self.__scan_dict(template, replacements)
 
-    def __scan_nodes(
+    def __scan_list(
+        self, template: List[Dict[str, Any]], replacements: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:
+        """
+        Iterate the list template.
+
+        Args:
+            template (list): Declares the template structure and variables.
+            replacements (dict): The values to be used as replacements.
+
+        Returns:
+            A list containing the template with the replaced values.
+        """
+        for key, value in enumerate(template):
+            self.__scan_node(template, replacements, key, value)
+        return template
+
+    def __scan_dict(
         self, template: Dict[str, Any], replacements: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
-        Iterate the template and replace the variables with the values.
+        Iterate the dict template.
 
         Args:
             template (dict): Declares the template structure and variables.
@@ -76,16 +91,36 @@ class Jsoninja:
             A dict containing the template with the replaced values.
         """
         for key, value in template.items():
-            if isinstance(value, dict):
-                template[key] = self.__scan_nodes(value, replacements)
-            else:
-                replacement = self.__get_replacement(value, replacements)
-                if replacement is not None:
-                    if callable(replacement):
-                        template[key] = replacement()
-                    else:
-                        template[key] = replacement
+            self.__scan_node(template, replacements, key, value)
         return template
+
+    def __scan_node(
+        self,
+        template: Union[List[Dict[str, Any]], Dict[str, Any]],
+        replacements: Dict[str, Any],
+        key: Union[int, str],
+        value: Any,
+    ) -> None:
+        """
+        Replace the node variables with the values.
+
+        Args:
+            template (list | dict): Declares the template structure and variables.
+            replacements (dict): The values to be used as replacements.
+            key (int | str): The index referring to the position of the node.
+            value (Any): The value of the node.
+        """
+        if isinstance(value, list):
+            self.__scan_list(value, replacements)
+        elif isinstance(value, dict):
+            template[key] = self.__scan_dict(value, replacements)  # type: ignore[index]
+        else:
+            replacement = self.__get_replacement(value, replacements)
+            if replacement is not None:
+                if callable(replacement):
+                    template[key] = replacement()  # type: ignore[index]
+                else:
+                    template[key] = replacement  # type: ignore[index]
 
     def __get_replacement(self, value: Any, replacements: Dict[str, Any]) -> Any:
         """
