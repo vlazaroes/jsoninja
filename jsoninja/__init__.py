@@ -1,6 +1,6 @@
 """
 Jsoninja is a library that allows you to generate JSON's from templates written with
-Python dicts.
+Python data types.
 """
 
 import copy
@@ -21,9 +21,9 @@ class Jsoninja:
 
     def replace(
         self,
-        template: Union[List[Dict[str, Any]], Dict[str, Any]],
+        template: Union[List[Dict[Any, Any]], Dict[Any, Any]],
         replacements: Dict[str, Any],
-    ) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
+    ) -> Union[List[Dict[Any, Any]], Dict[Any, Any]]:
         """
         Replaces the variables declared in the template.
 
@@ -43,9 +43,9 @@ class Jsoninja:
 
     def __scan_template(
         self,
-        template: Union[List[Dict[str, Any]], Dict[str, Any]],
+        template: Union[List[Dict[Any, Any]], Dict[Any, Any]],
         replacements: Dict[str, Any],
-    ) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
+    ) -> Union[List[Dict[Any, Any]], Dict[Any, Any]]:
         """
         Checks if the first node of the template is a list or a dict.
 
@@ -61,10 +61,10 @@ class Jsoninja:
         return self.__scan_dict(template, replacements)
 
     def __scan_list(
-        self, template: List[Dict[str, Any]], replacements: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, template: List[Dict[Any, Any]], replacements: Dict[str, Any]
+    ) -> List[Dict[Any, Any]]:
         """
-        Iterate the list template.
+        Iterate over the list template.
 
         Args:
             template (list): Declares the template structure and variables.
@@ -73,15 +73,15 @@ class Jsoninja:
         Returns:
             A list containing the template with the replaced values.
         """
-        for key, value in enumerate(template):
-            self.__scan_node(template, replacements, key, value)
+        for index, dictionary in enumerate(template):
+            self.__scan_node(template, replacements, index, dictionary)
         return template
 
     def __scan_dict(
-        self, template: Dict[str, Any], replacements: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, template: Dict[Any, Any], replacements: Dict[str, Any]
+    ) -> Dict[Any, Any]:
         """
-        Iterate the dict template and stores the key replacements to be replaced.
+        Iterate over the dict template and stores the key replacements to be replaced.
 
         Args:
             template (dict): Declares the template structure and variables.
@@ -90,85 +90,115 @@ class Jsoninja:
         Returns:
             A dict containing the template with the replaced values.
         """
-        key_replacements = {}
+        key_replacements: Dict[str, Any] = {}
         for key, value in template.items():
-            replacement = self.__get_replacement(key, replacements)
-            if replacement is not None:
-                key_replacements[key] = replacement
+            self.__apply_replacement(key_replacements, replacements, key, key)
             self.__scan_node(template, replacements, key, value)
         self.__replace_keys(template, key_replacements)
         return template
 
     def __scan_node(
         self,
-        template: Union[List[Dict[str, Any]], Dict[str, Any]],
+        template: Union[List[Dict[Any, Any]], Dict[Any, Any]],
         replacements: Dict[str, Any],
-        key: Union[int, str],
+        key: Any,
         value: Any,
     ) -> None:
         """
-        Replace the node variables with the corresponding values.
+        Replace the node variables with the corresponding replacements.
 
         Args:
             template (list | dict): Declares the template structure and variables.
             replacements (dict): The values to be used as replacements.
-            key (int | str): The index referring to the position of the node.
+            key (Any): The key of the node.
             value (Any): The value of the node.
         """
         if isinstance(value, list):
             self.__scan_list(value, replacements)
         elif isinstance(value, dict):
-            template[key] = self.__scan_dict(value, replacements)  # type: ignore[index]
+            template[key] = self.__scan_dict(value, replacements)
         else:
-            replacement = self.__get_replacement(value, replacements)
-            if replacement is not None:
-                if callable(replacement):
-                    template[key] = replacement()  # type: ignore[index]
-                else:
-                    template[key] = replacement  # type: ignore[index]
+            self.__apply_replacement(template, replacements, key, value)
+
+    def __apply_replacement(
+        self,
+        structure: Union[List[Dict[Any, Any]], Dict[Any, Any]],
+        replacements: Dict[str, Any],
+        key: Any,
+        variable: Any,
+    ) -> None:
+        """
+        Obtains the replacement of a variable and applies it to the structure.
+
+        Args:
+            structure (list | dict): Declares the structure and variables.
+            replacements (dict): The values to be used as replacements.
+            key (Any): The key of the node.
+            variable (Any): The template variable.
+        """
+        replacement = self.__get_replacement(variable, replacements)
+        if replacement is not None:
+            if callable(replacement):
+                structure[key] = replacement()
+            else:
+                structure[key] = replacement
 
     def __get_replacement(self, variable: Any, replacements: Dict[str, Any]) -> Any:
         """
-        Gets the value associated with the template variable.
+        Checks if the received variable is valid and then gets its replacement.
 
         Args:
             variable (Any): The template variable.
             replacements (dict): The values to be used as replacements.
 
         Returns:
-            The value associated with the template variable.
+            The replacement associated for the template variable or None.
 
         Raises:
             KeyError: Unable to find a replacement for "...".
         """
-        if self.__variable_regex.fullmatch(str(variable)):
-            value_key = self.__clean_value(variable)
-            if value_key in replacements:
-                return replacements[value_key]
-            raise KeyError(f'Unable to find a replacement for "{value_key}".')
-        return None
+        replacement: Any = None
+        matches = self.__variable_regex.finditer(str(variable))
+        for match in matches:
+            var_name = self.__clean_variable(match.group(0))
+            if var_name not in replacements:
+                raise KeyError(f'Unable to find a replacement for "{var_name}".')
+            if match.group(0) == variable:
+                return replacements[var_name]
+            if replacement is None:
+                replacement = variable
+            replacement = replacement.replace(match.group(0), replacements[var_name])
+        return replacement
 
-    def __clean_value(self, value: str) -> str:
+    def __clean_variable(self, variable: str) -> str:
         """
-        Removes the brackets that declare the variable from the value.
+        Removes the brackets that declare the template variable.
 
         Args:
-            value (str): The value corresponding to the template variable.
+            variable (str): The template variable.
 
         Returns:
-            The value without the brackets that declare the variable.
+            A str with the template variable name without the brackets.
         """
-        return value[2:-2].strip()
+        return variable[2:-2].strip()
 
     def __replace_keys(
-        self, template: Dict[str, Any], replacements: Dict[str, Any]
+        self, template: Dict[Any, Any], replacements: Dict[str, Any]
     ) -> None:
         """
-        Replaces the variables declared in the keys.
+        Replaces the template variables declared in the keys.
 
         Args:
             template (dict): Declares the template structure and variables.
             replacements (dict): The values to be used as replacements.
+
+        Raises:
+            TypeError: Key replacement must be str, int, float or bool (...).
         """
-        for key, new_key in replacements.items():
-            template[new_key] = template.pop(key)
+        for variable, value in replacements.items():
+            if not isinstance(value, (str, int, float, bool)):
+                value_key = self.__clean_variable(variable)
+                raise TypeError(
+                    f"Key replacement must be str, int, float or bool ({value_key})."
+                )
+            template[value] = template.pop(variable)
