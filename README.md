@@ -1,24 +1,18 @@
 <div align="center">
 	<p>
-        <a href="https://pypi.org/project/jsoninja">
-            <img src="https://em-content.zobj.net/thumbs/240/apple/354/ninja_1f977.png" width="100px">
-        </a>
+        <img src="https://em-content.zobj.net/thumbs/240/apple/354/ninja_1f977.png" width="100px">
     </p>
 	<h1>Jsoninja</h1>
     <p>
         <em>
             A library that allows you to generate JSON's from
             <br/>
-            templates written with Python dicts.
+            templates written with Python data types.
         </em>
     </p>
     <p>
-        <a href="https://pypi.org/project/jsoninja">
-            <img src="https://img.shields.io/pypi/v/jsoninja?label=Version" alt="Library version">
-        </a>
-        <a href="https://pypi.org/project/jsoninja">
-            <img src="https://img.shields.io/pypi/pyversions/jsoninja.svg?label=Python" alt="Supported Python versions">
-        </a>
+        <img src="https://img.shields.io/pypi/v/jsoninja?label=Version" alt="Library version">
+        <img src="https://img.shields.io/pypi/pyversions/jsoninja.svg?label=Python" alt="Supported Python versions">
     </p>
 </div>
 
@@ -49,7 +43,7 @@ result = jsoninja.replace(template, replacements)
 # }
 ```
 
-Allows multiple substitutions of the same variable:
+Allows multiple replacements of the same variable:
 
 ```python
 from jsoninja import Jsoninja
@@ -95,3 +89,25 @@ result = jsoninja.replace(template, replacements)
 #   "password": "super_secret_password",
 # }
 ```
+
+Support for variables in the dict keys (_replacements must be str, int, float or bool_):
+
+```python
+from jsoninja import Jsoninja
+
+jsoninja = Jsoninja()
+template = {
+    "{{variable_name}}": "bar",
+}
+replacements = {
+    "variable_name": "foo",
+}
+result = jsoninja.replace(template, replacements)
+
+# {
+#   "foo": "bar",
+# }
+```
+
+## Known Limitations
+- When replacing a variable declared in a `dict` key, the order will change.
