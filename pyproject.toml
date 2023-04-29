@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jsoninja"
-version = "1.0.1"
-description = "Jsoninja is a library that allows you to generate JSON's from templates written with Python dicts."
+version = "1.0.2"
+description = "Jsoninja is a library that allows you to generate JSON's from templates written with Python data types."
 readme = "README.md"
 requires-python = ">=3.7"
 license = { file = "LICENSE" }
@@ -28,6 +28,8 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Topic :: File Formats",
+    "Topic :: File Formats :: JSON",
     "Topic :: Software Development",
     "Topic :: Software Development :: Libraries",
     "Topic :: Software Development :: Libraries :: Python Modules",
