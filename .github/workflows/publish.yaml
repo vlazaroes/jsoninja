@@ -4,7 +4,7 @@ on:
     types: [published]
 
 jobs:
-  release:
+  publish:
     name: Publish in PyPI
     runs-on: ubuntu-latest
     steps:
