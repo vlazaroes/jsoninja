@@ -189,6 +189,7 @@ def test_full_replacement_flow() -> None:
         "lastname": "Doe",
         "age": "{{age}}",
         "married": "{{married}}",
+        "children": "{{children}}",
         "money": "{{money}}",
         "attributes": "{{attributes}}",
         "hobbies": "{{hobbies}}",
@@ -204,6 +205,7 @@ def test_full_replacement_flow() -> None:
         "name": "John",
         "age": 25,
         "married": False,
+        "children": None,
         "money": 123.45,
         "attributes": {
             "height": 180,
@@ -223,6 +225,7 @@ def test_full_replacement_flow() -> None:
         "lastname": "Doe",
         "age": 25,
         "married": False,
+        "children": None,
         "money": 123.45,
         "attributes": {
             "height": 180,
