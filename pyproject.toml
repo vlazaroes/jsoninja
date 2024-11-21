@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jsoninja"
-version = "1.0.3"
+version = "1.0.4"
 description = "Jsoninja is a library that allows you to generate JSON's from templates written with Python data types."
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 license = { file = "LICENSE" }
 authors = [
     { name = "Víctor Lázaro", email = "vlazaro@outlook.es" },
@@ -23,11 +23,6 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Topic :: File Formats",
     "Topic :: File Formats :: JSON",
     "Topic :: Software Development",
@@ -39,23 +34,22 @@ classifiers = [
 [project.urls]
 Source = "https://github.com/vlazaroes/jsoninja"
 
-[project.optional-dependencies]
-dev = [
-    "black == 23.3.0",
-    "coverage == 7.2.2",
-    "isort == 5.12.0",
-    "mypy == 1.1.1",
-    "pre-commit == 3.2.2",
-    "pylint == 2.17.2",
-    "pytest == 7.2.2",
+[tool.ruff.lint]
+select = [
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort
+    "UP", # pyupgrade
+    "W",  # pycodestyle warnings
+]
+ignore = [
+    "E501", # line too long
 ]
 
-[tool.isort]
-profile = "black"
+[tool.ruff.lint.isort]
+known-first-party = ["jsoninja", "tests"]
 
 [tool.mypy]
 strict = true
-
-[tool.pylint]
-disable = "R0903"
-max-line-length = "88"
