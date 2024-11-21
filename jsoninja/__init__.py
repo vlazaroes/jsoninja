@@ -8,7 +8,7 @@ import re
 from typing import Any, Dict, List, Union
 
 
-class NoReplacement:
+class _NoReplacement:
     """
     Class for representing an empty type when there is no replacement.
     """
@@ -143,7 +143,7 @@ class Jsoninja:
             variable (Any): The template variable.
         """
         replacement = self.__get_replacement(variable, replacements)
-        if not isinstance(replacement, NoReplacement):
+        if not isinstance(replacement, _NoReplacement):
             if callable(replacement):
                 structure[key] = replacement()
             else:
@@ -163,7 +163,7 @@ class Jsoninja:
         Raises:
             KeyError: Unable to find a replacement for "...".
         """
-        replacement: Any = NoReplacement()
+        replacement: Any = _NoReplacement()
         matches = self.__variable_regex.finditer(str(variable))
         for match in matches:
             var_name = self.__clean_variable(match.group(0))
@@ -171,7 +171,7 @@ class Jsoninja:
                 raise KeyError(f'Unable to find a replacement for "{var_name}".')
             if match.group(0) == variable:
                 return replacements[var_name]
-            if isinstance(replacement, NoReplacement):
+            if isinstance(replacement, _NoReplacement):
                 replacement = variable
             replacement = replacement.replace(match.group(0), replacements[var_name])
         return replacement
