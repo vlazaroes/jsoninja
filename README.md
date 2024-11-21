@@ -12,7 +12,6 @@
     </p>
     <p>
         <img src="https://img.shields.io/pypi/v/jsoninja?label=Version" alt="Library version">
-        <img src="https://img.shields.io/pypi/pyversions/jsoninja.svg?label=Python" alt="Supported Python versions">
     </p>
 </div>
 
@@ -108,6 +107,3 @@ result = jsoninja.replace(template, replacements)
 #   "foo": "bar",
 # }
 ```
-
-## Known Limitations
-- When replacing a variable declared in a `dict` key, the order will change.
