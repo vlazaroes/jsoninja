@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
 set -x
 
-black jsoninja tests
-isort jsoninja tests
+ruff check jsoninja tests --fix
+ruff format jsoninja tests

@@ -3,7 +3,6 @@
 set -e
 set -x
 
+ruff check jsoninja tests
+ruff format jsoninja tests --check
 mypy jsoninja tests
-pylint jsoninja tests
-black jsoninja tests --check
-isort jsoninja tests --check-only
