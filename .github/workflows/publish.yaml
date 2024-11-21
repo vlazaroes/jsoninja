@@ -1,4 +1,6 @@
+---
 name: Publish
+
 on:
   release:
     types: [published]
@@ -8,16 +10,21 @@ jobs:
     name: Publish in PyPI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up
-        uses: actions/setup-python@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.7"
-      - name: Install
-        run: pip install build
-      - name: Build
-        run: python -m build
-      - name: Publish
-        uses: pypa/gh-action-pypi-publish@v1.8.5
+          python-version: 3.8
+          cache: pip
+
+      - name: Build package
+        run: |
+          pip install build
+          python -m build
+
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@v1.12.2
         with:
           password: ${{ secrets.PYPI_API_TOKEN }}
