@@ -24,11 +24,14 @@ class Jsoninja:
         Initializes the instance with the variable RegEx.
         """
         self.__variable_regex = re.compile(r"\{\{\ ?[a-zA-Z0-9_]+\ ?\}\}")
+        self.__raise_on_missing = True
 
     def replace(
         self,
         template: Union[List[Dict[Any, Any]], Dict[Any, Any]],
         replacements: Dict[str, Any],
+        *,
+        raise_on_missing: bool = True,
     ) -> Union[List[Dict[Any, Any]], Dict[Any, Any]]:
         """
         Replaces the variables declared in the template.
@@ -45,6 +48,7 @@ class Jsoninja:
         """
         if not template:
             raise ValueError("A template has not been loaded.")
+        self.__raise_on_missing = raise_on_missing
         return self.__scan_template(copy.deepcopy(template), replacements)
 
     def __scan_template(
@@ -168,6 +172,8 @@ class Jsoninja:
         for match in matches:
             var_name = self.__clean_variable(match.group(0))
             if var_name not in replacements:
+                if self.__raise_on_missing is False:
+                    continue
                 raise KeyError(f'Unable to find a replacement for "{var_name}".')
             if match.group(0) == variable:
                 return replacements[var_name]

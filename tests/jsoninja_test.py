@@ -128,6 +128,11 @@ def test_missing_replacement() -> None:
     replacements = {
         "firstname": "John",
     }
+    expected = {
+        "firstname": "John",
+        "lastname": "{{lastname}}",
+    }
+    assert jsoninja.replace(template, replacements, raise_on_missing=False) == expected
     with pytest.raises(
         KeyError, match=re.escape('Unable to find a replacement for "lastname".')
     ):
