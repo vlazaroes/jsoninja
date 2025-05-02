@@ -64,24 +64,24 @@ def test_variable_declarations() -> None:
     """
     jsoninja = Jsoninja()
     template = {
-        "declaration1": "{{type1}}",
-        "declaration2": "{{ type2 }}",
-        "declaration3": "{{type1}}-{{ type2 }}",
-        "{{type1}}": "declaration1",
-        "{{ type2 }}": "declaration2",
-        "{{type1}}-{{ type2 }}": "declaration3",
+        "without_spaces": "{{type1}}",
+        "with_spaces": "{{ type2 }}",
+        "multiple_variables": "{{type1}}_{{ type2 }}",
+        "{{type1}}": "without_spaces",
+        "{{ type2 }}": "with_spaces",
+        "{{type1}}_{{ type2 }}": "multiple_variables",
     }
     replacements = {
-        "type1": "type1",
-        "type2": "type2",
+        "type1": "replacement1",
+        "type2": "replacement2",
     }
     expected = {
-        "declaration1": "type1",
-        "declaration2": "type2",
-        "declaration3": "type1-type2",
-        "type1": "declaration1",
-        "type2": "declaration2",
-        "type1-type2": "declaration3",
+        "without_spaces": "replacement1",
+        "with_spaces": "replacement2",
+        "multiple_variables": "replacement1_replacement2",
+        "replacement1": "without_spaces",
+        "replacement2": "with_spaces",
+        "replacement1_replacement2": "multiple_variables",
     }
     assert jsoninja.replace(template, replacements) == expected
 
@@ -179,62 +179,27 @@ def test_callback_functions() -> None:
     assert jsoninja.replace(template, replacements) == expected
 
 
-def test_full_replacement_flow() -> None:
+def test_list_replacements() -> None:
     """
-    Tests a complete replacement flow.
+    Tests that items can be added to a list with replacements.
     """
     jsoninja = Jsoninja()
     template = {
-        "firstname": "{{name}}",
-        "lastname": "Doe",
-        "age": "{{age}}",
-        "married": "{{married}}",
-        "children": "{{children}}",
-        "money": "{{money}}",
-        "attributes": "{{attributes}}",
-        "hobbies": "{{hobbies}}",
         "pets": [
             {
                 "name": "Qwerty",
                 "type": "fish",
             },
-            "{{pet}}",
-        ],
+            "{{dog}}",
+        ]
     }
     replacements = {
-        "name": "John",
-        "age": 25,
-        "married": False,
-        "children": None,
-        "money": 123.45,
-        "attributes": {
-            "height": 180,
-            "weight": 75.5,
-        },
-        "hobbies": [
-            "climbing",
-            "videogames",
-        ],
-        "pet": {
+        "dog": {
             "name": "Firulais",
             "type": "dog",
-        },
+        }
     }
     expected = {
-        "firstname": "John",
-        "lastname": "Doe",
-        "age": 25,
-        "married": False,
-        "children": None,
-        "money": 123.45,
-        "attributes": {
-            "height": 180,
-            "weight": 75.5,
-        },
-        "hobbies": [
-            "climbing",
-            "videogames",
-        ],
         "pets": [
             {
                 "name": "Qwerty",
@@ -244,6 +209,6 @@ def test_full_replacement_flow() -> None:
                 "name": "Firulais",
                 "type": "dog",
             },
-        ],
+        ]
     }
     assert jsoninja.replace(template, replacements) == expected
