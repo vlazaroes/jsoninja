@@ -24,7 +24,6 @@ class Jsoninja:
         Initializes the instance with the variable RegEx.
         """
         self.__variable_regex = re.compile(r"\{\{\ ?[a-zA-Z0-9_]+\ ?\}\}")
-        self.__raise_on_missing = True
 
     def replace(
         self,
@@ -39,6 +38,8 @@ class Jsoninja:
         Args:
             template (list | dict): Declares the template structure and variables.
             replacements (dict): The values to be used as replacements.
+            raise_on_missing (bool): Check if an exception should be thrown when no
+                replacement is found.
 
         Returns:
             A list or a dict containing the template with the replaced values.
@@ -48,13 +49,15 @@ class Jsoninja:
         """
         if not template:
             raise ValueError("A template has not been loaded.")
-        self.__raise_on_missing = raise_on_missing
-        return self.__scan_template(copy.deepcopy(template), replacements)
+        return self.__scan_template(
+            copy.deepcopy(template), replacements, raise_on_missing
+        )
 
     def __scan_template(
         self,
         template: Union[List[Dict[Any, Any]], Dict[Any, Any]],
         replacements: Dict[str, Any],
+        raise_on_missing: bool,
     ) -> Union[List[Dict[Any, Any]], Dict[Any, Any]]:
         """
         Checks if the first node of the template is a list or a dict.
@@ -62,16 +65,21 @@ class Jsoninja:
         Args:
             template (list | dict): Declares the template structure and variables.
             replacements (dict): The values to be used as replacements.
+            raise_on_missing (bool): Check if an exception should be thrown when no
+                replacement is found.
 
         Returns:
             A list or a dict containing the template with the replaced values.
         """
         if isinstance(template, list):
-            return self.__scan_list(template, replacements)
-        return self.__scan_dict(template, replacements)
+            return self.__scan_list(template, replacements, raise_on_missing)
+        return self.__scan_dict(template, replacements, raise_on_missing)
 
     def __scan_list(
-        self, template: List[Dict[Any, Any]], replacements: Dict[str, Any]
+        self,
+        template: List[Dict[Any, Any]],
+        replacements: Dict[str, Any],
+        raise_on_missing: bool,
     ) -> List[Dict[Any, Any]]:
         """
         Iterate over the list template.
@@ -79,16 +87,23 @@ class Jsoninja:
         Args:
             template (list): Declares the template structure and variables.
             replacements (dict): The values to be used as replacements.
+            raise_on_missing (bool): Check if an exception should be thrown when no
+                replacement is found.
 
         Returns:
             A list containing the template with the replaced values.
         """
         for index, dictionary in enumerate(template):
-            self.__scan_node(template, replacements, index, dictionary)
+            self.__scan_node(
+                template, replacements, index, dictionary, raise_on_missing
+            )
         return template
 
     def __scan_dict(
-        self, template: Dict[Any, Any], replacements: Dict[str, Any]
+        self,
+        template: Dict[Any, Any],
+        replacements: Dict[str, Any],
+        raise_on_missing: bool,
     ) -> Dict[Any, Any]:
         """
         Iterate over the dict template and stores the key replacements to be replaced.
@@ -96,14 +111,18 @@ class Jsoninja:
         Args:
             template (dict): Declares the template structure and variables.
             replacements (dict): The values to be used as replacements.
+            raise_on_missing (bool): Check if an exception should be thrown when no
+                replacement is found.
 
         Returns:
             A dict containing the template with the replaced values.
         """
         key_replacements: Dict[str, Any] = {}
         for key, value in template.items():
-            self.__apply_replacement(key_replacements, replacements, key, key)
-            self.__scan_node(template, replacements, key, value)
+            self.__apply_replacement(
+                key_replacements, replacements, key, key, raise_on_missing
+            )
+            self.__scan_node(template, replacements, key, value, raise_on_missing)
         self.__replace_keys(template, key_replacements)
         return template
 
@@ -113,6 +132,7 @@ class Jsoninja:
         replacements: Dict[str, Any],
         key: Any,
         value: Any,
+        raise_on_missing: bool,
     ) -> None:
         """
         Replace the node variables with the corresponding replacements.
@@ -122,13 +142,17 @@ class Jsoninja:
             replacements (dict): The values to be used as replacements.
             key (Any): The key of the node.
             value (Any): The value of the node.
+            raise_on_missing (bool): Check if an exception should be thrown when no
+                replacement is found.
         """
         if isinstance(value, list):
-            self.__scan_list(value, replacements)
+            self.__scan_list(value, replacements, raise_on_missing)
         elif isinstance(value, dict):
-            template[key] = self.__scan_dict(value, replacements)
+            template[key] = self.__scan_dict(value, replacements, raise_on_missing)
         else:
-            self.__apply_replacement(template, replacements, key, value)
+            self.__apply_replacement(
+                template, replacements, key, value, raise_on_missing
+            )
 
     def __apply_replacement(
         self,
@@ -136,6 +160,7 @@ class Jsoninja:
         replacements: Dict[str, Any],
         key: Any,
         variable: Any,
+        raise_on_missing: bool,
     ) -> None:
         """
         Obtains the replacement of a variable and applies it to the structure.
@@ -145,21 +170,30 @@ class Jsoninja:
             replacements (dict): The values to be used as replacements.
             key (Any): The key of the node.
             variable (Any): The template variable.
+            raise_on_missing (bool): Check if an exception should be thrown when no
+                replacement is found.
         """
-        replacement = self.__get_replacement(variable, replacements)
+        replacement = self.__get_replacement(variable, replacements, raise_on_missing)
         if not isinstance(replacement, _NoReplacement):
             if callable(replacement):
                 structure[key] = replacement()
             else:
                 structure[key] = replacement
 
-    def __get_replacement(self, variable: Any, replacements: Dict[str, Any]) -> Any:
+    def __get_replacement(
+        self,
+        variable: Any,
+        replacements: Dict[str, Any],
+        raise_on_missing: bool,
+    ) -> Any:
         """
         Checks if the received variable is valid and then gets its replacement.
 
         Args:
             variable (Any): The template variable.
             replacements (dict): The values to be used as replacements.
+            raise_on_missing (bool): Check if an exception should be thrown when no
+                replacement is found.
 
         Returns:
             The replacement associated for the template variable or None.
@@ -172,7 +206,7 @@ class Jsoninja:
         for match in matches:
             var_name = self.__clean_variable(match.group(0))
             if var_name not in replacements:
-                if self.__raise_on_missing is False:
+                if raise_on_missing is False:
                     continue
                 raise KeyError(f'Unable to find a replacement for "{var_name}".')
             if match.group(0) == variable:
