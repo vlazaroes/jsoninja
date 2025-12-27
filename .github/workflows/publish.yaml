@@ -9,6 +9,10 @@ jobs:
   publish:
     name: Publish in PyPI
     runs-on: ubuntu-latest
+    environment:
+      name: PyPI
+    permissions:
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
