@@ -1,6 +1,4 @@
 ---
-name: Dependabot
-
 version: 2
 updates:
   - package-ecosystem: "github-actions"
