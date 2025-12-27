@@ -26,9 +26,8 @@ $ pip install jsoninja
 You can use the main Python data types:
 
 ```python
-from jsoninja import Jsoninja
+import jsoninja
 
-jsoninja = Jsoninja()
 template = {
     "foo": "{{variable_name}}",
 }
@@ -45,9 +44,8 @@ result = jsoninja.replace(template, replacements)
 Allows multiple replacements of the same variable:
 
 ```python
-from jsoninja import Jsoninja
+import jsoninja
 
-jsoninja = Jsoninja()
 template = {
     "message1": "{{message}}",
     "message2": "{{message}}",
@@ -68,14 +66,13 @@ result = jsoninja.replace(template, replacements)
 Use callback functions to generate the values to be replaced:
 
 ```python
-from jsoninja import Jsoninja
+import jsoninja
 
 
 def generate_password() -> str:
     return "super_secret_password"
 
 
-jsoninja = Jsoninja()
 template = {
     "password": "{{password}}",
 }
@@ -92,14 +89,35 @@ result = jsoninja.replace(template, replacements)
 Support for variables in the dict keys (_replacements must be str, int, float or bool_):
 
 ```python
-from jsoninja import Jsoninja
+import jsoninja
 
-jsoninja = Jsoninja()
 template = {
     "{{variable_name}}": "bar",
 }
 replacements = {
     "variable_name": "foo",
+}
+result = jsoninja.replace(template, replacements)
+
+# {
+#   "foo": "bar",
+# }
+```
+
+If you want to use a custom variable pattern, you can do that too:
+
+```python
+from jsoninja import Jsoninja
+
+# The pattern must include a capturing group for the variable name.
+pattern = r"\$\{([a-zA-Z0-9_]+)\}"
+jsoninja = Jsoninja(variable_pattern=pattern)
+
+template = {
+    "foo": "${variable_name}",
+}
+replacements = {
+    "variable_name": "bar",
 }
 result = jsoninja.replace(template, replacements)
 
