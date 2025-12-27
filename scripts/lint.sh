@@ -5,4 +5,4 @@ set -x
 
 ruff check jsoninja tests
 ruff format jsoninja tests --check
-mypy jsoninja tests --strict
+ty check jsoninja tests
