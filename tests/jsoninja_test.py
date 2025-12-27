@@ -7,7 +7,53 @@ import re
 
 import pytest
 
-from jsoninja import Jsoninja
+from jsoninja import Jsoninja, replace
+
+
+def test_variable_pattern_string() -> None:
+    """
+    Tests that a custom variable pattern can be provided as a string.
+    """
+    pattern = r"\$\{([a-zA-Z0-9_]+)\}"
+    jsoninja = Jsoninja(variable_pattern=pattern)
+    template = {
+        "foo": "${foo}",
+    }
+    replacements = {
+        "foo": "bar",
+    }
+    expected = {
+        "foo": "bar",
+    }
+    assert jsoninja.replace(template, replacements) == expected
+
+
+def test_variable_pattern_compiled() -> None:
+    """
+    Tests that a custom variable pattern can be provided as a compiled Pattern.
+    """
+    pattern = re.compile(r"\$\{([a-zA-Z0-9_]+)\}")
+    jsoninja = Jsoninja(variable_pattern=pattern)
+    template = {
+        "foo": "${foo}",
+    }
+    replacements = {
+        "foo": "bar",
+    }
+    expected = {
+        "foo": "bar",
+    }
+    assert jsoninja.replace(template, replacements) == expected
+
+
+def test_variable_pattern_invalid_type() -> None:
+    """
+    Tests that an exception is raised when variable_pattern is not a valid type.
+    """
+    with pytest.raises(
+        TypeError, match=re.escape("variable_pattern must be str, Pattern or None.")
+    ):
+        Jsoninja(variable_pattern=123)  # type: ignore[arg-type]
 
 
 def test_no_list_template_received() -> None:
@@ -41,7 +87,12 @@ def test_returns_new_list_object() -> None:
     replacements = {
         "foo": "bar",
     }
-    assert jsoninja.replace(template, replacements) != template
+    expected = [
+        {
+            "foo": "bar",
+        },
+    ]
+    assert jsoninja.replace(template, replacements) == expected
 
 
 def test_returns_new_dict_object() -> None:
@@ -55,7 +106,10 @@ def test_returns_new_dict_object() -> None:
     replacements = {
         "foo": "bar",
     }
-    assert jsoninja.replace(template, replacements) != template
+    expected = {
+        "foo": "bar",
+    }
+    assert jsoninja.replace(template, replacements) == expected
 
 
 def test_variable_declarations() -> None:
@@ -217,3 +271,21 @@ def test_list_replacements() -> None:
         ]
     }
     assert jsoninja.replace(template, replacements) == expected
+
+
+def test_replace_helper_function() -> None:
+    """
+    Tests that the replace helper function works correctly using the default instance.
+    """
+    template = {
+        "foo": "{{foo}}",
+        "{{foo}}": "foo",
+    }
+    replacements = {
+        "foo": "bar",
+    }
+    expected = {
+        "foo": "bar",
+        "bar": "foo",
+    }
+    assert replace(template, replacements) == expected

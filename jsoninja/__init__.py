@@ -5,7 +5,7 @@ Python data types.
 
 import copy
 import re
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Pattern, Union
 
 
 class _NoReplacement:
@@ -19,11 +19,26 @@ class Jsoninja:
     Class that contains the necessary methods of Jsoninja.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self, *, variable_pattern: Optional[Union[str, Pattern[str]]] = None
+    ) -> None:
         """
-        Initializes the instance with the variable RegEx.
+        Initializes the instance with the variable pattern.
+
+        Args:
+            variable_pattern (str | Pattern | None): The regex pattern to identify
+                template variables.
         """
-        self.__variable_regex = re.compile(r"\{\{\ ?[a-zA-Z0-9_]+\ ?\}\}")
+        if isinstance(variable_pattern, str):
+            self.__variable_regex = re.compile(variable_pattern)
+            return
+        if isinstance(variable_pattern, Pattern):
+            self.__variable_regex = variable_pattern
+            return
+        if variable_pattern is None:
+            self.__variable_regex = re.compile(r"\{\{\ ?([a-zA-Z0-9_]+)\ ?\}\}")
+            return
+        raise TypeError("variable_pattern must be str, Pattern or None.")
 
     def replace(
         self,
@@ -147,12 +162,11 @@ class Jsoninja:
         """
         if isinstance(value, list):
             self.__scan_list(value, replacements, raise_on_missing)
-        elif isinstance(value, dict):
+            return
+        if isinstance(value, dict):
             template[key] = self.__scan_dict(value, replacements, raise_on_missing)
-        else:
-            self.__apply_replacement(
-                template, replacements, key, value, raise_on_missing
-            )
+            return
+        self.__apply_replacement(template, replacements, key, value, raise_on_missing)
 
     def __apply_replacement(
         self,
@@ -174,11 +188,12 @@ class Jsoninja:
                 replacement is found.
         """
         replacement = self.__get_replacement(variable, replacements, raise_on_missing)
-        if not isinstance(replacement, _NoReplacement):
-            if callable(replacement):
-                structure[key] = replacement()
-            else:
-                structure[key] = replacement
+        if isinstance(replacement, _NoReplacement):
+            return
+        if callable(replacement):
+            structure[key] = replacement()
+            return
+        structure[key] = replacement
 
     def __get_replacement(
         self,
@@ -204,29 +219,19 @@ class Jsoninja:
         replacement: Any = _NoReplacement()
         matches = self.__variable_regex.finditer(str(variable))
         for match in matches:
-            var_name = self.__clean_variable(match.group(0))
-            if var_name not in replacements:
+            variable_name = match.group(1)
+            if variable_name not in replacements:
                 if raise_on_missing is False:
                     continue
-                raise KeyError(f'Unable to find a replacement for "{var_name}".')
+                raise KeyError(f'Unable to find a replacement for "{variable_name}".')
             if match.group(0) == variable:
-                return replacements[var_name]
+                return replacements[variable_name]
             if isinstance(replacement, _NoReplacement):
                 replacement = variable
-            replacement = replacement.replace(match.group(0), replacements[var_name])
+            replacement = replacement.replace(
+                match.group(0), replacements[variable_name]
+            )
         return replacement
-
-    def __clean_variable(self, variable: str) -> str:
-        """
-        Removes the brackets that declare the template variable.
-
-        Args:
-            variable (str): The template variable.
-
-        Returns:
-            A str with the template variable name without the brackets.
-        """
-        return variable[2:-2].strip()
 
     def __replace_keys(
         self, template: Dict[Any, Any], replacements: Dict[str, Any]
@@ -243,8 +248,38 @@ class Jsoninja:
         """
         for variable, value in replacements.items():
             if not isinstance(value, (str, int, float, bool)):
-                value_key = self.__clean_variable(variable)
+                match = self.__variable_regex.match(variable)
+                value_key = match.group(1) if match and match.groups() else variable
                 raise TypeError(
                     f"Key replacement must be str, int, float or bool ({value_key})."
                 )
             template[value] = template.pop(variable)
+
+
+_default_instance = Jsoninja()
+
+
+def replace(
+    template: Union[List[Dict[Any, Any]], Dict[Any, Any]],
+    replacements: Dict[str, Any],
+    *,
+    raise_on_missing: bool = True,
+) -> Union[List[Dict[Any, Any]], Dict[Any, Any]]:
+    """
+    Replaces the variables declared in the template.
+
+    Args:
+        template (list | dict): Declares the template structure and variables.
+        replacements (dict): The values to be used as replacements.
+        raise_on_missing (bool): Check if an exception should be thrown when no
+            replacement is found.
+
+    Returns:
+        A list or a dict containing the template with the replaced values.
+
+    Raises:
+        ValueError: A template has not been loaded.
+    """
+    return _default_instance.replace(
+        template, replacements, raise_on_missing=raise_on_missing
+    )
