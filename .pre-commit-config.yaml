@@ -11,6 +11,7 @@ repos:
     hooks:
       - id: mypy
         args: [--strict]
+        additional_dependencies: [pytest==9.0.2]
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.3.0
     hooks:
