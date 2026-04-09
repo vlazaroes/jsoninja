@@ -53,7 +53,7 @@ def test_variable_pattern_invalid_type() -> None:
     with pytest.raises(
         TypeError, match=re.escape("variable_pattern must be str, Pattern or None.")
     ):
-        Jsoninja(variable_pattern=123)  # type: ignore[arg-type]
+        Jsoninja(variable_pattern=123)  # ty: ignore[invalid-argument-type]
 
 
 def test_no_list_template_received() -> None:
