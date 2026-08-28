@@ -4,4 +4,5 @@ set -e
 set -x
 
 coverage run -m pytest tests
-coverage report -m
+coverage combine
+coverage report
