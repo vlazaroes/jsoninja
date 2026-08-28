@@ -1,5 +1,6 @@
 ---
 version: 2
+
 updates:
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -7,6 +8,11 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pre-commit"
     directory: "/"
     schedule:
       interval: "monthly"
