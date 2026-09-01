@@ -37,7 +37,7 @@ dev = [
     "coverage==7.15.4; python_version>='3.10'",
     "pre-commit==4.6.2; python_version>='3.10'",
     "pytest==9.1.1; python_version>='3.10'",
-    "ruff==0.16.4",
+    "ruff==0.16.5",
     "ty==0.0.74",
 ]
 
